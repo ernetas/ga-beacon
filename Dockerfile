@@ -1,8 +1,11 @@
 FROM golang:latest as build
 ADD . /app
 WORKDIR /app
-RUN go get -d -v google.golang.org/appengine/cmd/aefix
-RUN go build -x -o /ga-beacon
+ENV GOHOME /usr/local/go/src/appengine
+RUN mkdir -p ${GOHOME} && \
+    go get -d -v ./... && \
+    ls -alh ${GOHOME}/ && \
+    go build -x -o /ga-beacon
 
 FROM ubuntu:latest
 COPY --from=build /ga-beacon /usr/bin/ga-beacon
@@ -12,5 +15,5 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 ADD . /usr/share/ga-beacon
 WORKDIR /usr/share/ga-beacon
-EXPOSE 9000
+EXPOSE 9001
 CMD [ "/usr/bin/ga-beacon" ]
