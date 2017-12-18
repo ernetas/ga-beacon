@@ -1,15 +1,16 @@
-# Google Analytics Beacon [![Analytics](https://ga-beacon.appspot.com/UA-71196-10/ga-beacon/readme?pixel)](https://github.com/igrigorik/ga-beacon)
+# Google Analytics Beacon [![Analytics](http://ga.rebill.info:8080/UA-5149421-7/github.com/rebill/ga-beacon?pixel)](https://github.com/rebill/ga-beacon)
 
-Sometimes it is impossible to embed the JavaScript tracking code provided by Google Analytics: the host page does not allow arbitrary JavaScript, and there is no Google Analytics integration. However, not all is lost! **If you can embed a simple image (pixel tracker), then you can beacon data to Google Analytics.** For a great, hands-on explanation of how this works, check out the following guides:
+Sometimes it is impossible to embed the JavaScript tracking code provided by Google Analytics: the host page does not allow arbitrary JavaScript, and there is no Google Analytics integration. However, not all is lost! **If you can embed a simple image (pixel tracker), then you can beacon data to Google Analytics.** For a great, hands-on explanation of how this works, check out [Using a Beacon Image for GitHub, Website and Email Analytics](http://www.sitepoint.com/using-beacon-image-github-website-email-analytics/). 
 
-* [Using a Beacon Image for GitHub, Website and Email Analytics](http://www.sitepoint.com/using-beacon-image-github-website-email-analytics/)
-* [Tracking Google Sheet views with Google Analytics using GA Beacon](http://mashe.hawksey.info/2014/02/tracking-google-sheet-views-with-google-analytics/)
 
-### Can I use this production?
+### Hands-on example: Google Analytics for GitHub 
 
-The ga-beacon.appspot.com instance is a **demo** instance, good for prototyping and proof of concepts. If you intend to use this in production for your application, you should deploy **your own instance** of this service, which will allow you to scale the service up and down to meet your capacity needs, introspect the logs, customize the code, and so on.
+[![GA Dashboard](https://lh5.googleusercontent.com/-Zu9r9m7Uv0c/UsSQlJ5OoeI/AAAAAAAAHwo/fvH_lrVUV0w/w1007-h467-no/skitch.png)](https://lh5.googleusercontent.com/-Zu9r9m7Uv0c/UsSQlJ5OoeI/AAAAAAAAHwo/fvH_lrVUV0w/w1007-h467-no/skitch.png)
 
-Deploying your own instance is trivial: fork this repo, modify the project name in app.yaml, and follow the [normal GAE deploy instructions](https://cloud.google.com/appengine/training/go-plus-appengine/deploy). You should be up and running in less than five minutes.
+**Curious which of your GitHub projects are getting all the traffic, or if anyone is reading your GitHub wiki pages?** Well, that's what Google Analytics is for! GitHub does not allow us to install arbitrary analytics, but we can still use a simple tracking image to log visits in real-time to Google Analytics - for full details, follow the instructions below. Once everything is setup, install [this custom dashboard](https://www.google.com/analytics/web/template?uid=MQS4cmZdSh2OWUVqRntqXQ) in your account for a nice real-time overview (as shown in above screenshot).
+
+_Note: GitHub [finally released traffic analytics](https://github.com/blog/1672-introducing-github-traffic-analytics) on Jan 7, 2014 -- wohoo! As a result, you can get most of the important insights by simply using that. If you still want real-time analytics, or an integration with your existing GA analytics, then you can use both the tracking pixel and built-in analytics._
+
 
 ### Setup instructions
 
@@ -22,32 +23,38 @@ First, log in to your Google Analytics account and [set up a new property](https
 
 Next, add a tracking image to the pages you want to track:
 
-* _https://ga-beacon.appspot.com/UA-XXXXX-X/insert/any/path_
+* _https://ga-beacon.appspot.com/UA-XXXXX-X/your-repo/page-name_
 * `UA-XXXXX-X` should be your tracking ID
-* `insert/any/path` is an arbitrary path. For best results specify a meaningful and self-descriptive path. You have to do this manually, the beacon won't automatically record the page path it's embedded on.
+* `your-repo/page-name` is an arbitrary path. For best results specify the repository name and the page name - e.g. if you have multiple readme's or wiki pages you can use different paths to map them to same repo: `your-repo/readme`, `your-repo/other-page`, and so on!
 
 Example tracker markup if you are using Markdown:
 
 ```markdown
-[![Analytics](https://ga-beacon.appspot.com/UA-XXXXX-X/welcome-page)](https://github.com/igrigorik/ga-beacon)
+[![Analytics](https://ga-beacon.appspot.com/UA-XXXXX-X/your-repo/page-name)](https://github.com/igrigorik/ga-beacon)
 ```
 
 Or RDoc:
 
 ```rdoc
-{<img src="https://ga-beacon.appspot.com/UA-XXXXX-X/welcome-page" />}[https://github.com/igrigorik/ga-beacon]
+{<img src="https://ga-beacon.appspot.com/UA-XXXXX-X/your-repo/page-name" />}[https://github.com/igrigorik/ga-beacon]
 ```
 
-If you prefer, you can skip the badge and use a transparent pixel. To do so, simply append `?pixel` to the image URL. There are also "flat" style variants available, which are available when appending `?flat` or `?flat-gif` to the image URL. And that's it, add the tracker image to the pages you want to track and then head to your Google Analytics account to see real-time and aggregated visit analytics for your projects!
+If you prefer, you can skip the badge and use a transparent pixel. To do so, simply append `?pixel` to the image URL.
 
-You may also auto-calculate the tracking path based in the "referer" information of the image. To activate this simple add `?useReferer` to the image URL (or `&useReferer` if you need to combine this with the `?pixel`, `?flat` or `?flat-gif` parameter). Although they are some odd browsers that don't always send the referer header, the amount of traffic coming from those browsers is usually not relevant at all. Of course that if you need to measure the traffic from those odd browsers you should not use this method.
+And that's it, add the tracker image to the pages you want to track and then head to your Google Analytics account to see real-time and aggregated visit analytics for your projects!
+
+### Stand-alone
+
+If you want to deploy code on your own server, you can run `stand-alone.go` as you need.
 
 ### FAQ
 
-- **How does this work?** Google Analytics provides a [measurement protocol](https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide) which allows us to POST arbitrary visit data directly to Google servers, and that's exactly what GA Beacon does: we include an image request on our pages which hits the GA Beacon service, and GA Beacon POSTs the visit data to Google Analytics to record the visit. As a result, if you can embed an image, you can beacon data to Google Analytics.
+- **How does this work?** GitHub does not allow arbitrary JavaScript to run on its pages. As a result, we can't use standard analytics snippets to track visitors and pageviews. However, Google Analytics provides a [measurement protocol](https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide) which allows us to POST the visit data directly to Google servers, and that's exactly what GA Beacon does: we include an image request on our pages which hits the GA Beacon service, and GA Beacon POST's the visit to Google Analytics to record the visit.
 
-- **Why do we need to proxy?** Google Analytics supports reporting of visit data [via GET requests](https://developers.google.com/analytics/devguides/collection/protocol/v1/reference#transport), but unfortunately we can't use that directly because we need to generate and report a unique visitor ID for each hit - e.g. some pages do not allow us to run JS on the client to generate the ID. To address this, we proxy the request through ga-beacon.appspot.com, which in turn is responsible for generating the unique visitor ID (server generated UUID), setting the appropriate cookies for repeat hits, and reporting the hits to Google Analytics.
+- **Why do we need to proxy?** Google Analytics supports reporting of visit data [via GET requests](https://developers.google.com/analytics/devguides/collection/protocol/v1/reference#transport), but unfortunately we can't use that directly because we need to generate and report a unique visitor ID for each hit - GitHub does not allow us to run JS on the client to generate the ID. To address this, we proxy the request through ga-beacon.appspot.com, which in turn is responsible for generating the unique visitor ID (server generated UUID) and reporting the hit to Google Analytics.
 
-- **What about referrals and other visitor information?** Unfortunately the static tracking pixel approach limits the information we can collect about the visit. For example, referral information can't be passed to the tracking pixel because we can't execute JavaScript. As a result, the available metrics are restricted to unique visitors, pageviews, and the User-Agent and IP address of the visitor.
+- **What about referrals and other visitor information?** Unfortunately the static tracking pixel approach limits the information we can collect about the visit. For example, referral information is only available on the GitHub page itself and can't be passed to the tracking pixel. As a result, the available metrics are restricted to unique visitors, pageviews, and the User-Agent of the visitor.
 
-- **Do I have to use ga-beacon.appspot.com?** You can if you want to - it's free, but there are no capacity or availability promises. For best results, deploy your own instance directly on Google App Engine: clone this repository, change the project name, and deploy your own instance - easy as that. The project is under MIT license.
+- **Can I use this outside of GitHub?** Yep, [you certainly can](http://www.sitepoint.com/using-beacon-image-github-website-email-analytics/). It's a generic beacon service.
+
+- **Do I have to use ga-beacon.appspot.com?** You can if you want to - it's free. Alternatively, feel free to deploy your own instance directly on Google App Engine. The project is under MIT license.

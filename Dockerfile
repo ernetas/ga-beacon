@@ -3,12 +3,10 @@ ADD . /app
 WORKDIR /app
 ENV GOHOME /usr/local/go/src/appengine
 RUN mkdir -p ${GOHOME} && \
-    go get -d -v ./... && \
-    ls -alh ${GOHOME}/ && \
-    go build -x -o /ga-beacon
+    go build -x -o /stand-alone
 
 FROM ubuntu:latest
-COPY --from=build /ga-beacon /usr/bin/ga-beacon
+COPY --from=build /stand-alone /usr/bin/ga-beacon
 RUN apt-get update && \
     apt-get install -y -q libgo9 && \
     apt-get clean && \

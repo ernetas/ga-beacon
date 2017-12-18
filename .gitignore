@@ -7,3 +7,6 @@ _cgo_*
 _test*
 *.out
 _obj
+stand-alone
+*.log
+*.pid
