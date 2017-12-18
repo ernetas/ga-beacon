@@ -14,6 +14,6 @@ RUN apt-get update && \
 ADD . /usr/share/ga-beacon
 WORKDIR /usr/share/ga-beacon
 EXPOSE 9001
-HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 --start-period=5m \
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=15s \
     CMD curl -f http://localhost:9001
 CMD [ "/usr/bin/ga-beacon" ]
